@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Jackpot Vertical</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial, sans-serif;
+    background: radial-gradient(circle at top, #222 0%, #000 70%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+}
+
+#app{
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    padding:20px;
+}
+
+h1{
+    color:gold;
+    margin-bottom:25px;
+    text-shadow:0 0 10px rgba(255,215,0,0.6);
+}
+
+#slots{
+    display:flex;
+    justify-content:space-between;
+    margin:25px 0;
+}
+
+.slot-container{
+    width:30%;
+    aspect-ratio:1/1;
+    border-radius:18px;
+    overflow:hidden;
+    background:#000;
+    position:relative;
+
+    border:3px solid #ffcc00;
+    box-shadow:
+        0 0 10px rgba(255,215,0,.7),
+        inset 0 0 10px rgba(255,215,0,.3);
+}
+
+.slot{
+    position:absolute;
+    width:100%;
+    top:0;
+}
+
+.item{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.item img{
+    width:85%;
+    height:85%;
+    object-fit:contain;
+}
+
+button{
+    width:85%;
+    margin-top:25px;
+    padding:18px;
+    font-size:22px;
+    font-weight:bold;
+    background: linear-gradient(180deg,#ffd700,#ff9f00);
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    color:#000;
+    box-shadow:0 6px 0 #b57c00;
+}
+
+button:active{
+    transform:translateY(2px);
+    box-shadow:0 4px 0 #b57c00;
+}
+
+button:disabled{
+    opacity:.6;
+}
+
+#resultado{
+    margin-top:22px;
+    font-size:22px;
+    min-height:32px;
+    font-weight:bold;
+}
+
+.win{
+    color:#00ff99;
+    text-shadow:0 0 8px #00ff99;
+}
+
+.lose{
+    color:#ff4d4d;
+    text-shadow:0 0 8px #ff4d4d;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<h1>🎰 Jackpot Vertical</h1>
+
+<div id="slots">
+    <div class="slot-container"><div class="slot" id="slot1"></div></div>
+    <div class="slot-container"><div class="slot" id="slot2"></div></div>
+    <div class="slot-container"><div class="slot" id="slot3"></div></div>
+</div>
+
+<button id="btnGirar">JOGAR</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+$(function(){
+
+const totalIcons = 10;
+let iconHeight = $(".slot-container").width();
+
+function montar(slot){
+    slot.html("");
+    for(let i=0;i<12;i++){
+        for(let n=0;n<totalIcons;n++){
+            slot.append(`
+                <div class="item" style="height:${iconHeight}px">
+                    <img src="img/imagem${n}.png">
+                </div>
+            `);
+        }
+    }
+}
+
+function montarTodos(){
+    iconHeight = $(".slot-container").width();
+    montar($("#slot1"));
+    montar($("#slot2"));
+    montar($("#slot3"));
+}
+
+montarTodos();
+$(window).on("resize", montarTodos);
+
+function girarSlot(slot, callback){
+    const index = Math.floor(Math.random()*totalIcons);
+    const destino = (totalIcons*6 + index) * iconHeight;
+
+    slot.stop(true,true).css("top",0);
+
+    slot.animate({ top: -destino }, 2400, "swing", function(){
+        callback(index);
+    });
+}
+
+$("#btnGirar").click(function(){
+
+    const btn = $(this);
+    if(btn.prop("disabled")) return;
+
+    btn.prop("disabled", true);
+    $("#resultado").removeClass("win lose").html("");
+
+    let r1=null,r2=null,r3=null;
+
+    girarSlot($("#slot1"), n=>{r1=n; verificar();});
+    setTimeout(()=>girarSlot($("#slot2"), n=>{r2=n; verificar();}),200);
+    setTimeout(()=>girarSlot($("#slot3"), n=>{r3=n; verificar();}),400);
+
+    function verificar(){
+        if(r1!==null && r2!==null && r3!==null){
+
+            if(r1===r2 && r2===r3){
+                $("#resultado").addClass("win").html("🎉 JACKPOT!");
+            }else{
+                $("#resultado").addClass("lose").html("❌ Tente novamente");
+            }
+
+            btn.prop("disabled", false);
+        }
+    }
+
+});
+
+});
+</script>
+
+</body>
+</html>
