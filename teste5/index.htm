@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Jackpot Vertical</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial, sans-serif;
+    background: url("fundo.png") no-repeat center center fixed;
+    background-size: cover;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+}
+
+#app{
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    padding:20px;
+    backdrop-filter: blur(2px);
+}
+
+h1{
+    color:gold;
+    margin-bottom:20px;
+}
+
+#slots{
+    display:flex;
+    justify-content:space-between;
+    margin:20px 0;
+}
+
+.slot-container{
+    width:30%;
+    aspect-ratio:1/1;
+    border:3px solid gold;
+    border-radius:16px;
+    overflow:hidden;
+    background:#000;
+    position:relative;
+}
+
+.slot{
+    position:absolute;
+    width:100%;
+    top:0;
+}
+
+.item{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.item img{
+    width:85%;
+    height:85%;
+    object-fit:contain;
+}
+
+button{
+    width:80%;
+    margin-top:20px;
+    padding:16px;
+    font-size:22px;
+    font-weight:bold;
+    background:gold;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:.6;
+}
+
+#resultado{
+    margin-top:20px;
+    font-size:22px;
+    color:gold;
+    min-height:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<h1>🎰 Jackpot Vertical</h1>
+
+<div id="slots">
+    <div class="slot-container"><div class="slot" id="slot1"></div></div>
+    <div class="slot-container"><div class="slot" id="slot2"></div></div>
+    <div class="slot-container"><div class="slot" id="slot3"></div></div>
+</div>
+
+<button id="btnGirar">JOGAR</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+$(function(){
+
+const totalIcons = 10;
+const iconHeight = $(".slot-container").width();
+
+function montar(slot){
+    slot.html("");
+    for(let i=0;i<12;i++){
+        for(let n=0;n<totalIcons;n++){
+            slot.append(`
+                <div class="item" style="height:${iconHeight}px">
+                    <img src="img/imagem${n}.png">
+                </div>
+            `);
+        }
+    }
+}
+
+montar($("#slot1"));
+montar($("#slot2"));
+montar($("#slot3"));
+
+function girarSlot(slot, callback){
+
+    const index = Math.floor(Math.random()*totalIcons);
+    const destino = (totalIcons*6 + index) * iconHeight;
+
+    slot.css("top",0);
+
+    slot.animate({
+        top: -destino
+    }, 2500, "swing", function(){
+        callback(index);
+    });
+}
+
+$("#btnGirar").click(function(){
+
+    $(this).prop("disabled", true);
+    $("#resultado").html("");
+
+    let r1=null,r2=null,r3=null;
+
+    girarSlot($("#slot1"), n=>{r1=n; verificar();});
+    setTimeout(()=>girarSlot($("#slot2"), n=>{r2=n; verificar();}),200);
+    setTimeout(()=>girarSlot($("#slot3"), n=>{r3=n; verificar();}),400);
+
+    function verificar(){
+        if(r1!==null && r2!==null && r3!==null){
+            if(r1===r2 && r2===r3){
+                $("#resultado").html("🎉 JACKPOT!");
+            }else{
+                $("#resultado").html("❌ Tente novamente");
+            }
+            $("#btnGirar").prop("disabled", false);
+        }
+    }
+
+});
+
+});
+</script>
+
+</body>
+</html>

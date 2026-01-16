@@ -2,15 +2,13 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jackpot Vertical Mobile</title>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -32,24 +30,34 @@ h1 {
 
 #slots {
     display: flex;
-    justify-content: center;
-    gap: 14px;
+    gap: 16px;
     margin-bottom: 25px;
 }
 
 .slot-container {
     width: 28vw;
-    max-width: 140px;
+    max-width: 150px;
     height: 28vw;
-    max-height: 140px;
-    min-width: 100px;
-    min-height: 100px;
+    max-height: 150px;
+    min-width: 110px;
+    min-height: 110px;
     overflow: hidden;
     border: 3px solid gold;
     background: #000;
-    border-radius: 10px;
+    border-radius: 12px;
     position: relative;
     box-shadow: 0 0 12px rgba(255,215,0,0.6);
+}
+
+/* linha central de referência (opcional, pode remover) */
+.slot-container::after{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:50%;
+    height:2px;
+    background:rgba(255,255,255,0.15);
 }
 
 .slot {
@@ -83,12 +91,9 @@ button {
     border-radius: 10px;
     color: #000;
     font-weight: bold;
-    margin-top: 10px;
 }
 
-button:disabled {
-    opacity: 0.6;
-}
+button:disabled { opacity: 0.6; }
 
 #resultado {
     margin-top: 20px;
@@ -116,14 +121,16 @@ button:disabled {
 <script>
 $(function(){
 
+    const pasta = ""; // se usar pasta: "img/"
+
     const imagens = [];
     for(let i=0;i<=9;i++){
-        imagens.push("imagem"+i+".png");
+        imagens.push(pasta + "imagem" + i + ".png");
     }
 
     function montar(slot){
         slot.html("");
-        for(let i=0;i<10;i++){
+        for(let i=0;i<12;i++){
             imagens.forEach((img, index)=>{
                 slot.append(`
                     <div class="item" data-valor="${index}">
@@ -140,19 +147,56 @@ $(function(){
 
     function girarSlot(slot, callback){
 
-        const alturaItem = slot.find(".item").outerHeight();
+        const item = slot.find(".item").first();
+        const alturaItem = item.outerHeight();
+        const alturaContainer = slot.parent().height();
         const total = slot.find(".item").length;
 
         const index = Math.floor(Math.random() * imagens.length);
 
-        const base = Math.floor(total/2) * alturaItem;
-        const destino = base + (index * alturaItem);
+        const centroContainer = alturaContainer / 2 - alturaItem / 2;
+        const base = Math.floor(total / 2) * alturaItem;
+
+        const destino = base + (index * alturaItem) - centroContainer;
 
         slot.stop(true,true).css("top",0);
 
-        slot.animate({ top: -destino }, 2500, "swing", function(){
+        slot.animate({ top: -destino }, 2300, "swing", function(){
             callback(index);
         });
     }
 
-    $("#btnGirar").o
+    $("#btnGirar").on("click", function(){
+
+        const btn = $(this);
+        if(btn.prop("disabled")) return;
+
+        btn.prop("disabled", true);
+        $("#resultado").html("");
+
+        let r1, r2, r3;
+
+        girarSlot($("#slot1"), v => { r1 = v; verificar(); });
+        setTimeout(()=>girarSlot($("#slot2"), v => { r2 = v; verificar(); }), 200);
+        setTimeout(()=>girarSlot($("#slot3"), v => { r3 = v; verificar(); }), 400);
+
+        function verificar(){
+            if(r1 !== undefined && r2 !== undefined && r3 !== undefined){
+
+                if(r1 === r2 && r2 === r3){
+                    $("#resultado").html("🎉 JACKPOT! Número " + r1);
+                } else {
+                    $("#resultado").html("❌ Tente novamente");
+                }
+
+                btn.prop("disabled", false);
+            }
+        }
+
+    });
+
+});
+</script>
+
+</body>
+</html>
