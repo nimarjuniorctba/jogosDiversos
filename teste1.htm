@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Jackpot Vertical</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body {
+    background: #111;
+    color: #fff;
+    font-family: Arial;
+    text-align: center;
+    padding-top: 40px;
+}
+
+#slots {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.slot-container {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border: 3px solid gold;
+    background: #000;
+    position: relative;
+}
+
+.slot {
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.item {
+    height: 120px;
+    line-height: 120px;
+    font-size: 32px;
+    font-weight: bold;
+    border-bottom: 1px solid #222;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 16px;
+    background: gold;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+button:disabled {
+    background: #666;
+}
+
+#resultado {
+    margin-top: 25px;
+    font-size: 24px;
+    color: gold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎰 Jackpot Vertical</h1>
+
+<div id="slots">
+    <div class="slot-container"><div class="slot" id="slot1"></div></div>
+    <div class="slot-container"><div class="slot" id="slot2"></div></div>
+    <div class="slot-container"><div class="slot" id="slot3"></div></div>
+</div>
+
+<button id="btnGirar">Girar</button>
+
+<div id="resultado"></div>
+
+<script>
+$(function(){
+
+    const numeros = [1,2,3,4,5,6,7];
+
+    function montar(slot){
+        slot.html("");
+        for(let i=0;i<12;i++){
+            numeros.forEach(n=>{
+                slot.append(`<div class="item">${n}</div>`);
+            });
+        }
+    }
+
+    montar($("#slot1"));
+    montar($("#slot2"));
+    montar($("#slot3"));
+
+    function girarSlot(slot, callback){
+        const alturaItem = 120;
+        const total = slot.find(".item").length;
+        const index = Math.floor(Math.random() * numeros.length);
+        const numero = numeros[index];
+
+        const base = (total/2) * alturaItem;
+        const destino = base + (index * alturaItem);
+
+        slot.css("top", 0);
+
+        slot.animate({
+            top: -destino
+        }, 3000, "swing", function(){
+            callback(numero);
+        });
+    }
+
+    $("#btnGirar").click(function(){
+
+        $(this).prop("disabled", true);
+        $("#resultado").html("");
+
+        let r1, r2, r3;
+
+        girarSlot($("#slot1"), function(n){
+            r1 = n;
+            verificar();
+        });
+
+        setTimeout(()=>{
+            girarSlot($("#slot2"), function(n){
+                r2 = n;
+                verificar();
+            });
+        }, 300);
+
+        setTimeout(()=>{
+            girarSlot($("#slot3"), function(n){
+                r3 = n;
+                verificar();
+            });
+        }, 600);
+
+        function verificar(){
+            if(r1 && r2 && r3){
+                if(r1 === r2 && r2 === r3){
+                    $("#resultado").html("🎉 JACKPOT! Número " + r1);
+                } else {
+                    $("#resultado").html("❌ Tente novamente");
+                }
+                $("#btnGirar").prop("disabled", false);
+            }
+        }
+
+    });
+
+});
+</script>
+
+</body>
+</html>

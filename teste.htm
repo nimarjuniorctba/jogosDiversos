@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Jackpot Roleta</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #fff;
+    text-align: center;
+    padding-top: 40px;
+}
+
+#container {
+    width: 400px;
+    margin: auto;
+}
+
+#roleta-container {
+    width: 350px;
+    height: 80px;
+    overflow: hidden;
+    border: 3px solid gold;
+    margin: 20px auto;
+    position: relative;
+    background: #000;
+}
+
+#roleta {
+    display: flex;
+    position: absolute;
+    left: 0;
+}
+
+.item {
+    min-width: 100px;
+    height: 80px;
+    line-height: 80px;
+    border-right: 2px solid #222;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.item:nth-child(odd) { background: #222; }
+.item:nth-child(even) { background: #333; }
+
+#ponteiro {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 80px;
+    background: red;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 16px;
+    background: gold;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:disabled {
+    background: #666;
+}
+
+#resultado {
+    margin-top: 20px;
+    font-size: 22px;
+    color: gold;
+}
+</style>
+</head>
+
+<body>
+
+<div id="container">
+    <h1>🎰 Jackpot Roleta</h1>
+
+    <div id="roleta-container">
+        <div id="ponteiro"></div>
+        <div id="roleta"></div>
+    </div>
+
+    <button id="btnGirar">Girar</button>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+$(function(){
+
+    const premios = [10, 25, 50, 100, 250, 500, 1000];
+
+    function montarRoleta() {
+        $("#roleta").html("");
+
+        // repetir várias vezes para dar efeito infinito
+        for(let i = 0; i < 10; i++){
+            premios.forEach(p => {
+                $("#roleta").append(`<div class="item">R$ ${p}</div>`);
+            });
+        }
+    }
+
+    montarRoleta();
+
+    $("#btnGirar").click(function(){
+
+        $(this).prop("disabled", true);
+        $("#resultado").html("");
+
+        const larguraItem = 100;
+        const totalItens = $("#roleta .item").length;
+
+        const indicePremio = Math.floor(Math.random() * premios.length);
+        const premio = premios[indicePremio];
+
+        // posição alvo (no meio da tela)
+        const offsetBase = (totalItens / 2) * larguraItem;
+        const destino = offsetBase + (indicePremio * larguraItem);
+
+        $("#roleta").css("left", 0);
+
+        $("#roleta").animate({
+            left: -destino
+        }, 4000, "swing", function(){
+
+            $("#resultado").html("🎉 Você ganhou R$ " + premio);
+            $("#btnGirar").prop("disabled", false);
+
+        });
+
+    });
+
+});
+</script>
+
+</body>
+</html>
