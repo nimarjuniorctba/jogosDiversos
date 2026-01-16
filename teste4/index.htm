@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jackpot Vertical Mobile</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #222, #000);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    color: gold;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+#slots {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 25px;
+}
+
+.slot-container {
+    width: 28vw;
+    max-width: 140px;
+    height: 28vw;
+    max-height: 140px;
+    min-width: 100px;
+    min-height: 100px;
+    overflow: hidden;
+    border: 3px solid gold;
+    background: #000;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 0 12px rgba(255,215,0,0.6);
+}
+
+.slot {
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    border-bottom: 1px solid #333;
+}
+
+.item img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+button {
+    width: 70%;
+    max-width: 260px;
+    padding: 16px;
+    font-size: 20px;
+    background: linear-gradient(#ffd700, #ffb700);
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+button:disabled {
+    opacity: 0.6;
+}
+
+#resultado {
+    margin-top: 20px;
+    font-size: 22px;
+    color: gold;
+    min-height: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎰 Jackpot Vertical</h1>
+
+<div id="slots">
+    <div class="slot-container"><div class="slot" id="slot1"></div></div>
+    <div class="slot-container"><div class="slot" id="slot2"></div></div>
+    <div class="slot-container"><div class="slot" id="slot3"></div></div>
+</div>
+
+<button id="btnGirar">GIRAR</button>
+
+<div id="resultado"></div>
+
+<script>
+$(function(){
+
+    const imagens = [];
+    for(let i=0;i<=9;i++){
+        imagens.push("imagem"+i+".png");
+    }
+
+    function montar(slot){
+        slot.html("");
+        for(let i=0;i<10;i++){
+            imagens.forEach((img, index)=>{
+                slot.append(`
+                    <div class="item" data-valor="${index}">
+                        <img src="${img}">
+                    </div>
+                `);
+            });
+        }
+    }
+
+    montar($("#slot1"));
+    montar($("#slot2"));
+    montar($("#slot3"));
+
+    function girarSlot(slot, callback){
+
+        const alturaItem = slot.find(".item").outerHeight();
+        const total = slot.find(".item").length;
+
+        const index = Math.floor(Math.random() * imagens.length);
+
+        const base = Math.floor(total/2) * alturaItem;
+        const destino = base + (index * alturaItem);
+
+        slot.stop(true,true).css("top",0);
+
+        slot.animate({ top: -destino }, 2500, "swing", function(){
+            callback(index);
+        });
+    }
+
+    $("#btnGirar").o
